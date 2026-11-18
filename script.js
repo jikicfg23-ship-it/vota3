@@ -1,14 +1,13 @@
 // ==========================================
-// 1. إعدادات الاتصال بمحرك Groq فائق السرعة
+// 1. إعدادات الاتصال بمحرك Groq
 // ==========================================
-const GROQ_API_KEY = "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";
-const MODEL_NAME = "llama-3.3-70b-versatile"; // أحدث وأقوى نموذج مجاني في Groq
+const GROQ_API_KEY = "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";
+const MODEL_NAME = "llama-3.3-70b-versatile";
 
 const chatBox = document.getElementById('chat-box');
 const userInput = document.getElementById('user-input');
 const sendBtn = document.getElementById('send-btn');
 
-// شخصية وذاكرة التطبيق
 const systemPrompt = {
     role: "system",
     content: "أنت مساعد ذكاء اصطناعي متطور اسمك Vota. تتحدث باللغة العربية بطلاقة وذكاء، وتجيب بدقة واحترافية، وتستخدم التنسيق الجيد (نقاط وعناوين وأكواد) عند الحاجة."
@@ -16,7 +15,6 @@ const systemPrompt = {
 
 let conversationHistory = [systemPrompt];
 
-// تكبير مربع النص تلقائياً أثناء الكتابة
 userInput.addEventListener('input', function() {
     this.style.height = 'auto';
     this.style.height = (this.scrollHeight) + 'px';
@@ -51,7 +49,6 @@ async function sendMessage() {
     const text = userInput.value.trim();
     if (!text) return;
 
-    // عرض رسالة المستخدم
     const userMsgDiv = createMessageElement(true);
     userMsgDiv.textContent = text;
 
@@ -61,61 +58,37 @@ async function sendMessage() {
 
     conversationHistory.push({ role: "user", content: text });
 
-    // إنشاء فقاعة رد الذكاء الاصطناعي للكتابة التدريجية (Streaming)
     const aiMsgDiv = createMessageElement(false);
-    aiMsgDiv.innerHTML = '<span style="color:#38bdf8;">Vota يفكر...</span>';
-    let fullReply = "";
+    aiMsgDiv.innerHTML = '<span style="color:#38bdf8;">⏳ Vota يفكر الآن...</span>';
 
     try {
         const response = await fetch("https://groq.com", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
-                "Authorization": `Bearer ${GROQ_API_KEY}`
+                "Authorization": `Bearer ${GROQ_API_KEY.trim()}`
             },
             body: JSON.stringify({
                 model: MODEL_NAME,
                 messages: conversationHistory,
-                stream: true // تفعيل البث المباشر للكلمات حرفاً بحرف
+                temperature: 0.7
             })
         });
 
+        const data = await response.json();
+
         if (!response.ok) {
-            const errData = await response.json();
-            throw new Error(errData.error?.message || "خطأ في الاتصال بالخادم");
+            throw new Error(data.error?.message || `خطأ رقم ${response.status}`);
         }
 
-        const reader = response.body.getReader();
-        const decoder = new TextDecoder("utf-8");
-
-        while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
-
-            const chunk = decoder.decode(value);
-            const lines = chunk.split("\n");
-
-            for (const line of lines) {
-                if (line.startsWith("data: ") && line !== "data: [DONE]") {
-                    try {
-                        const json = JSON.parse(line.substring(6));
-                        const token = json.choices?.delta?.content || "";
-                        fullReply += token;
-                        // تحويل النص المنسق (Markdown) إلى HTML حي
-                        aiMsgDiv.innerHTML = typeof marked !== 'undefined' ? marked.parse(fullReply) : fullReply;
-                        chatBox.scrollTop = chatBox.scrollHeight;
-                    } catch (e) {
-                        // تجاهل الأجزاء غير المكتملة من البث
-                    }
-                }
-            }
-        }
-
-        conversationHistory.push({ role: "assistant", content: fullReply });
+        const aiReply = data.choices[0].message.content;
+        aiMsgDiv.innerHTML = typeof marked !== 'undefined' ? marked.parse(aiReply) : aiReply;
+        conversationHistory.push({ role: "assistant", content: aiReply });
+        chatBox.scrollTop = chatBox.scrollHeight;
 
     } catch (error) {
-        aiMsgDiv.innerHTML = `<span style="color:#f87171;">⚠️ حدث خطأ: ${error.message}</span>`;
-        conversationHistory.pop(); // إزالة الرسالة الأخيرة عند الفشل
+        aiMsgDiv.innerHTML = `<span style="color:#f87171;">⚠️ السبب: ${error.message}</span>`;
+        conversationHistory.pop();
     } finally {
         sendBtn.disabled = false;
         userInput.focus();
@@ -139,7 +112,7 @@ function handleKeyPress(event) {
 }
 
 // ==========================================
-// 2. الخلفية التفاعلية المتحركة (شبكة الذكاء الاصطناعي)
+// 2. الخلفية التفاعلية المتحركة
 // ==========================================
 const canvas = document.getElementById('bg-canvas');
 const ctx = canvas.getContext('2d');
@@ -152,8 +125,8 @@ let mouse = { x: null, y: null, radius: 130 };
 window.addEventListener('mousemove', (e) => { mouse.x = e.x; mouse.y = e.y; });
 window.addEventListener('touchmove', (e) => {
     if (e.touches.length > 0) {
-        mouse.x = e.touches.clientX;
-        mouse.y = e.touches.clientY;
+        mouse.x = e.touches[0].clientX;
+        mouse.y = e.touches[0].clientY;
     }
 });
 window.addEventListener('resize', () => {
