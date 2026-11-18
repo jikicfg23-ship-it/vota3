@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vota AI - مساعدك الذكي</title>
+    <link rel="stylesheet" href="style.css">
+    <!-- مكتبة لتنسيق النصوص والأكواد البرمجية مثل التطبيقات الحقيقية -->
+    <script src="https://jsdelivr.net"></script>
+</head>
+<body>
+
+    <canvas id="bg-canvas"></canvas>
+
+    <div class="app-container">
+        <div class="header">
+            <div class="logo">
+                <div class="logo-orb"></div>
+                <div>
+                    <h1>VOTA AI</h1>
+                    <span class="subtitle">مدعوم بمحرك Llama 3.3 فائق السرعة</span>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="icon-btn" onclick="clearChat()" title="محادثة جديدة">🗑️ مسح</button>
+                <div class="status">● متصل</div>
+            </div>
+        </div>
+
+        <div class="chat-box" id="chat-box">
+            <div class="message-wrapper ai-wrapper">
+                <div class="message ai-msg">أهلاً بك! أنا <strong>Vota</strong>، مساعدك الذكي الشخصي. كيف يمكنني مساعدتك اليوم؟</div>
+            </div>
+        </div>
+
+        <div class="input-area">
+            <textarea id="user-input" rows="1" placeholder="اسأل Vota عن أي شيء..." onkeydown="handleKeyPress(event)"></textarea>
+            <button id="send-btn" onclick="sendMessage()">إرسال ✈️</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
