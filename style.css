@@ -1,0 +1,265 @@
+@import url('https://googleapis.com');
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Cairo', sans-serif;
+}
+
+body {
+    background-color: #060913;
+    color: #ffffff;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+#bg-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+}
+
+.app-container {
+    position: relative;
+    z-index: 1;
+    width: 95%;
+    max-width: 900px;
+    height: 90vh;
+    background: rgba(13, 19, 33, 0.78);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(56, 189, 248, 0.2);
+    border-radius: 24px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.85);
+    overflow: hidden;
+}
+
+/* الشريط العلوي */
+.header {
+    padding: 15px 22px;
+    background: rgba(255, 255, 255, 0.02);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.logo-orb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: linear-gradient(45deg, #00f2fe, #4facfe);
+    box-shadow: 0 0 15px #00f2fe;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(0.95); box-shadow: 0 0 10px #00f2fe; }
+    50% { transform: scale(1.1); box-shadow: 0 0 25px #4facfe; }
+    100% { transform: scale(0.95); box-shadow: 0 0 10px #00f2fe; }
+}
+
+.logo h1 {
+    font-size: 1.4rem;
+    font-weight: 700;
+    background: linear-gradient(90deg, #00f2fe, #4facfe, #c084fc);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    line-height: 1.2;
+}
+
+.subtitle {
+    font-size: 0.75rem;
+    color: #94a3b8;
+    display: block;
+}
+
+.header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.icon-btn {
+    background: rgba(255, 255, 255, 0.07);
+    color: #cbd5e1;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 6px 12px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.icon-btn:hover {
+    background: rgba(239, 68, 68, 0.2);
+    color: #fca5a5;
+    border-color: rgba(239, 68, 68, 0.4);
+}
+
+.status {
+    font-size: 0.8rem;
+    color: #4ade80;
+    background: rgba(74, 222, 128, 0.1);
+    border: 1px solid rgba(74, 222, 128, 0.2);
+    padding: 5px 12px;
+    border-radius: 20px;
+}
+
+/* منطقة المحادثة */
+.chat-box {
+    flex: 1;
+    padding: 20px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    scroll-behavior: smooth;
+}
+
+.chat-box::-webkit-scrollbar { width: 5px; }
+.chat-box::-webkit-scrollbar-thumb { background: rgba(56, 189, 248, 0.3); border-radius: 10px; }
+
+.message-wrapper {
+    display: flex;
+    flex-direction: column;
+    max-width: 85%;
+    animation: fadeIn 0.3s ease;
+}
+
+.user-wrapper { align-self: flex-start; }
+.ai-wrapper { align-self: flex-end; }
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.message {
+    padding: 14px 18px;
+    border-radius: 18px;
+    line-height: 1.7;
+    font-size: 0.98rem;
+    word-wrap: break-word;
+}
+
+.user-msg {
+    background: linear-gradient(135deg, #2563eb, #3b82f6);
+    color: white;
+    border-bottom-right-radius: 4px;
+    white-space: pre-wrap;
+}
+
+.ai-msg {
+    background: rgba(30, 41, 59, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #f1f5f9;
+    border-bottom-left-radius: 4px;
+}
+
+/* تنسيق الأكواد والفقرات داخل ردود الذكاء الاصطناعي */
+.ai-msg p { margin-bottom: 10px; }
+.ai-msg p:last-child { margin-bottom: 0; }
+.ai-msg ul, .ai-msg ol { margin: 10px 20px; }
+.ai-msg pre {
+    background: #090d16;
+    padding: 12px;
+    border-radius: 10px;
+    overflow-x: auto;
+    margin: 10px 0;
+    border: 1px solid rgba(56, 189, 248, 0.2);
+    direction: ltr;
+    text-align: left;
+}
+.ai-msg code {
+    font-family: 'Fira Code', monospace;
+    font-size: 0.88rem;
+    color: #38bdf8;
+}
+
+.copy-btn {
+    align-self: flex-end;
+    background: transparent;
+    border: none;
+    color: #94a3b8;
+    font-size: 0.78rem;
+    margin-top: 5px;
+    cursor: pointer;
+    padding: 2px 8px;
+    border-radius: 6px;
+}
+
+.copy-btn:hover {
+    color: #38bdf8;
+    background: rgba(255, 255, 255, 0.05);
+}
+
+/* منطقة الكتابة السفلية */
+.input-area {
+    padding: 15px 20px;
+    background: rgba(15, 23, 42, 0.85);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+}
+
+textarea {
+    flex: 1;
+    background: rgba(30, 41, 59, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 14px;
+    padding: 12px 16px;
+    color: white;
+    font-size: 1rem;
+    outline: none;
+    resize: none;
+    max-height: 120px;
+    line-height: 1.5;
+    transition: border-color 0.3s;
+}
+
+textarea:focus {
+    border-color: #38bdf8;
+}
+
+#send-btn {
+    background: linear-gradient(135deg, #00f2fe, #4facfe);
+    color: #060913;
+    border: none;
+    border-radius: 14px;
+    padding: 12px 22px;
+    font-weight: 700;
+    font-size: 0.98rem;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+    height: 48px;
+}
+
+#send-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(79, 172, 254, 0.4);
+}
+
+#send-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
